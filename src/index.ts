@@ -34,19 +34,15 @@ type Opts = {
 		allow?: boolean;
 		/** Time to wait for list, in milliseconds */
 		timeout?: number;
-	},
+	};
 	/** Telegraf Options */
 	telegraf?: {
 		polling?: LaunchPollingOptions;
 		webhook?: LaunchWebhookOptions;
 	};
-}
+};
 
-const Telegram: Plugin<
-	Opts,
-	[],
-	exports
-> = opts => {
+const Telegram: Plugin<Opts, [], exports> = opts => {
 	if (!opts.token) throw createError("'token' was not provided");
 
 	const bot = new Telegraf(opts.token);
@@ -139,15 +135,15 @@ const Telegram: Plugin<
 				bot.command("list", ctx =>
 					players.init
 						? ctx.reply(
-							[
-								`Players online (`,
-								`${code(players.list.length)}/${code(players.max)})`,
-								players.list.length
-									? `:\n${code(players.list.join("\n"))}`
-									: "",
-							].join(""),
-							tgOpts,
-						)
+								[
+									`Players online (`,
+									`${code(players.list.length)}/${code(players.max)})`,
+									players.list.length
+										? `:\n${code(players.list.join("\n"))}`
+										: "",
+								].join(""),
+								tgOpts,
+						  )
 						: ctx.reply("Player list not initialised."),
 				);
 			}
@@ -182,24 +178,24 @@ const Telegram: Plugin<
 			events.on("minecraft:advancement", ctx =>
 				send(
 					code(ctx.user) +
-					" has made the advancement " +
-					code("[" + ctx.advancement + "]"),
+						" has made the advancement " +
+						code("[" + ctx.advancement + "]"),
 				),
 			);
 
 			events.on("minecraft:goal", ctx =>
 				send(
 					code(ctx.user) +
-					" has reached the goal " +
-					code("[" + ctx.goal + "]"),
+						" has reached the goal " +
+						code("[" + ctx.goal + "]"),
 				),
 			);
 
 			events.on("minecraft:challenge", ctx =>
 				send(
 					code(ctx.user) +
-					" has completed the challenge " +
-					code("[" + ctx.challenge + "]"),
+						" has completed the challenge " +
+						code("[" + ctx.challenge + "]"),
 				),
 			);
 
