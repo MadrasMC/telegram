@@ -21,23 +21,29 @@ const createError = (...str: string[]) =>
 
 type exports = { send: (user: string, msg: string) => void };
 
-const Telegram: Plugin<
-	{
-		token: string;
-		enable: boolean;
-		chatId: string;
-		list: {
-			allow: boolean;
-			/**
-			 * Time to wait for list, in milliseconds
-			 */
-			timeout: number;
-		},
-		telegraf?: {
-			polling?: LaunchPollingOptions;
-			webhook?: LaunchWebhookOptions;
-		};
+type Opts = {
+	/** Enable the plugin */
+	enable: boolean;
+	/** Telegram Bot Token */
+	token: string;
+	/** Telegram Chat ID */
+	chatId: string;
+	/** /list Options */
+	list?: {
+		/** Allow the use of /list */
+		allow?: boolean;
+		/** Time to wait for list, in milliseconds */
+		timeout?: number;
 	},
+	/** Telegraf Options */
+	telegraf?: {
+		polling?: LaunchPollingOptions;
+		webhook?: LaunchWebhookOptions;
+	};
+}
+
+const Telegram: Plugin<
+	Opts,
 	[],
 	exports
 > = opts => {
@@ -78,11 +84,11 @@ const Telegram: Plugin<
 				},
 			};
 
-			if (opts.list && opts.list.allow) {
+			if (opts.list?.allow) {
 				new Promise<[string, string, string[]]>((resolve, reject) => {
 					const rejection = setTimeout(
 						() => reject(new Error("/list took too long!")),
-						opts.list.timeout ? opts.list.timeout : 15 * 1000,
+						opts.list?.timeout || 15 * 1000,
 					);
 
 					const cleanup = () => {
@@ -133,15 +139,15 @@ const Telegram: Plugin<
 				bot.command("list", ctx =>
 					players.init
 						? ctx.reply(
-								[
-									`Players online (`,
-									`${code(players.list.length)}/${code(players.max)})`,
-									players.list.length
-										? `:\n${code(players.list.join("\n"))}`
-										: "",
-								].join(""),
-								tgOpts,
-						  )
+							[
+								`Players online (`,
+								`${code(players.list.length)}/${code(players.max)})`,
+								players.list.length
+									? `:\n${code(players.list.join("\n"))}`
+									: "",
+							].join(""),
+							tgOpts,
+						)
 						: ctx.reply("Player list not initialised."),
 				);
 			}
@@ -176,24 +182,24 @@ const Telegram: Plugin<
 			events.on("minecraft:advancement", ctx =>
 				send(
 					code(ctx.user) +
-						" has made the advancement " +
-						code("[" + ctx.advancement + "]"),
+					" has made the advancement " +
+					code("[" + ctx.advancement + "]"),
 				),
 			);
 
 			events.on("minecraft:goal", ctx =>
 				send(
 					code(ctx.user) +
-						" has reached the goal " +
-						code("[" + ctx.goal + "]"),
+					" has reached the goal " +
+					code("[" + ctx.goal + "]"),
 				),
 			);
 
 			events.on("minecraft:challenge", ctx =>
 				send(
 					code(ctx.user) +
-						" has completed the challenge " +
-						code("[" + ctx.challenge + "]"),
+					" has completed the challenge " +
+					code("[" + ctx.challenge + "]"),
 				),
 			);
 
