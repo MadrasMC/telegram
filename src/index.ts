@@ -26,7 +26,13 @@ const Telegram: Plugin<
 		token: string;
 		enable: boolean;
 		chatId: string;
-		allowList: boolean;
+		list: {
+			allow: boolean;
+			/**
+			 * Time to wait for list, in milliseconds
+			 */
+			timeout: number;
+		},
 		telegraf?: {
 			polling?: LaunchPollingOptions;
 			webhook?: LaunchWebhookOptions;
@@ -72,11 +78,11 @@ const Telegram: Plugin<
 				},
 			};
 
-			if (opts.allowList) {
+			if (opts.list && opts.list.allow) {
 				new Promise<[string, string, string[]]>((resolve, reject) => {
 					const rejection = setTimeout(
 						() => reject(new Error("/list took too long!")),
-						15 * 1000,
+						opts.list.timeout ? opts.list.timeout : 15 * 1000,
 					);
 
 					const cleanup = () => {
